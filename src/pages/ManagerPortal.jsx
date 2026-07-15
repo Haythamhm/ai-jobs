@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Users, Star, FileText, Plus, Search, Edit2, Trash2, Loader } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getJobs, deleteJob, getApplications, updateApplicationStatus, getProfile, getJobById } from '../lib/storage';
+import { getJobs, deleteJob, getApplications, updateApplicationStatus, getProfile, getJobById, deleteApplication } from '../lib/storage';
 import { analyzeCandidate } from '../lib/aiService';
+import { useToast } from '../context/ToastContext';
 
-const STATUS_OPTIONS = ['In Review', 'Interview', 'Rejected'];
+const STATUS_OPTIONS = ['In Review', 'Interview', 'Hired', 'Rejected'];
 
 const getStatusBadge = (status) => {
   switch (status) {
-    case 'In Review': return 'bg-yellow-50 border-yellow-200 text-yellow-700';
-    case 'Interview': return 'bg-teal-50 border-teal-200 text-teal-700';
+    case 'In Review':
+    case 'Reviewed': return 'bg-yellow-50 border-yellow-200 text-yellow-700';
+    case 'Interview':
+    case 'Interviewing': return 'bg-teal-50 border-teal-200 text-teal-700';
+    case 'Hired': return 'bg-green-50 border-green-200 text-green-700';
     case 'Rejected': return 'bg-red-50 border-red-200 text-red-700';
     default: return 'bg-slate-100 border-slate-200 text-slate-600';
   }
@@ -24,6 +28,7 @@ const computeScore = (job, profileText) => {
 };
 
 export default function ManagerPortal() {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('jobs');
 
   // Jobs
@@ -45,45 +50,78 @@ export default function ManagerPortal() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
-    setJobs(getJobs());
-    const apps = getApplications();
-    setApplications(apps);
-    setProfile(getProfile());
+    const loadData = async () => {
+      const allJobs = await getJobs();
+      setJobs(allJobs);
+      const apps = await getApplications();
+      setApplications(apps);
+      const prof = await getProfile();
+      setProfile(prof);
+    };
+    loadData();
   }, []);
 
   // When selected app changes, load its job and run AI analysis
   useEffect(() => {
-    if (selectedApp) {
-      const job = getJobById(selectedApp.jobId);
-      setSelectedJob(job);
+    const loadSelectedJob = async () => {
+      if (selectedApp) {
+        const job = await getJobById(selectedApp.jobId);
+        setSelectedJob(job);
 
-      // Run AI analysis
-      const resumeText = profile?.extractedText || '';
-      if (job) {
+        // Run AI analysis
+        const resumeText = selectedApp?.resumeText || '';
+        if (job) {
+          setAiResult(null);
+          setIsAnalyzing(true);
+          analyzeCandidate(resumeText, job)
+            .then(result => setAiResult(result))
+            .finally(() => setIsAnalyzing(false));
+        }
+      } else {
+        setSelectedJob(null);
         setAiResult(null);
-        setIsAnalyzing(true);
-        analyzeCandidate(resumeText, job)
-          .then(result => setAiResult(result))
-          .finally(() => setIsAnalyzing(false));
       }
-    } else {
-      setSelectedJob(null);
-      setAiResult(null);
-    }
-  }, [selectedApp, profile]);
+    };
+    loadSelectedJob();
+  }, [selectedApp]);
 
-  const handleDeleteJob = (id) => {
+  const handleDeleteJob = async (id) => {
     if (window.confirm('Are you sure you want to delete this job offer?')) {
-      deleteJob(id);
-      setJobs(getJobs());
+      try {
+        await deleteJob(id);
+        const allJobs = await getJobs();
+        setJobs(allJobs);
+        showToast('Job offer deleted successfully.', 'success');
+      } catch (err) {
+        showToast(err.message || 'Failed to delete job offer.', 'error');
+      }
     }
   };
 
-  const handleStatusChange = (appId, newStatus) => {
-    updateApplicationStatus(appId, newStatus);
-    const updated = getApplications();
-    setApplications(updated);
-    setSelectedApp(updated.find(a => a.id === appId) || null);
+  const handleStatusChange = async (appId, newStatus) => {
+    try {
+      await updateApplicationStatus(appId, newStatus);
+      const updated = await getApplications();
+      setApplications(updated);
+      setSelectedApp(updated.find(a => a.id === appId) || null);
+      showToast(`Application status updated to "${newStatus}".`, 'success');
+    } catch (err) {
+      showToast(err.message || 'Failed to update application status.', 'error');
+    }
+  };
+
+  const handleDeleteApplication = async (appId) => {
+    if (window.confirm('Are you sure you want to delete this application?')) {
+      try {
+        await deleteApplication(appId);
+        const updated = await getApplications();
+        setApplications(updated);
+        setSelectedApp(null);
+        showToast('Application deleted successfully.', 'success');
+      } catch (err) {
+        showToast(err.message || 'Failed to delete application.', 'error');
+      }
+    }
   };
 
   const filteredJobs = jobs.filter(job => {
@@ -176,6 +214,8 @@ export default function ManagerPortal() {
                       <span>{job.location || 'No location'}</span>
                       <span>•</span>
                       <span>{job.type}</span>
+                      <span>•</span>
+                      <span>Posted {job.posted}</span>
                       {appCount > 0 && (
                         <>
                           <span>•</span>
@@ -243,11 +283,11 @@ export default function ManagerPortal() {
               </select>
             </div>
 
-            {/* List */}
+             {/* List */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {filteredApps.map(app => {
-                const job = getJobById(app.jobId);
-                const score = computeScore(job, profileText);
+                const job = jobs.find(j => j.id === app.jobId);
+                const score = computeScore(job, app.candidateProfile?.rawResumeText);
                 return (
                   <div
                     key={app.id}
@@ -255,7 +295,7 @@ export default function ManagerPortal() {
                     className={`p-4 rounded-xl cursor-pointer transition-all border ${selectedApp?.id === app.id ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-slate-200 bg-white hover:border-teal-300'}`}
                   >
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-bold text-slate-900 text-sm leading-snug">{profile?.name || 'Candidate'}</h3>
+                      <h3 className="font-bold text-slate-900 text-sm leading-snug">{app.candidateName}</h3>
                       {score !== null && (
                         <span className={`text-xs px-2 py-0.5 rounded font-bold ${score >= 70 ? 'bg-green-100 text-green-700' : score >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
                           {score}%
@@ -285,8 +325,18 @@ export default function ManagerPortal() {
                 <div className="p-6 border-b border-slate-100 bg-slate-50/50">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h2 className="text-2xl font-bold text-slate-900">{profile?.name || 'Candidate'}</h2>
-                      {profile?.email && <p className="text-slate-500 text-sm">{profile.email}</p>}
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-slate-900">{selectedApp.candidateName}</h2>
+                        <button
+                          onClick={() => handleDeleteApplication(selectedApp.id)}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="Delete Application"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                      {selectedApp.candidateEmail && <p className="text-slate-500 text-sm">{selectedApp.candidateEmail}</p>}
+                      {selectedApp.candidatePhone && <p className="text-slate-400 text-xs mt-0.5">Phone: {selectedApp.candidatePhone}</p>}
                       <p className="text-slate-500 mt-1">
                         Applied for: <span className="font-semibold text-slate-700">{selectedApp.jobTitle}</span>
                       </p>
@@ -306,10 +356,11 @@ export default function ManagerPortal() {
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                               s === 'Interview' ? 'border-teal-300 text-teal-700 hover:bg-teal-50' :
                               s === 'Rejected' ? 'border-red-300 text-red-700 hover:bg-red-50' :
+                              s === 'Hired' ? 'border-green-300 text-green-700 hover:bg-green-50' :
                               'border-yellow-300 text-yellow-700 hover:bg-yellow-50'
                             }`}
                           >
-                            → {s}
+                            → {s === 'Hired' ? 'Accept / Hire' : s === 'Rejected' ? 'Reject / Refuse' : s}
                           </button>
                         ))}
                       </div>
@@ -398,9 +449,9 @@ export default function ManagerPortal() {
                     <h3 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
                       <FileText size={18} /> Extracted Resume Content
                     </h3>
-                    {profile?.extractedText ? (
+                    {selectedApp?.resumeText ? (
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 font-mono text-sm text-slate-600 leading-relaxed whitespace-pre-wrap max-h-64 overflow-y-auto">
-                        {profile.extractedText}
+                        {selectedApp.resumeText}
                       </div>
                     ) : (
                       <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-400">

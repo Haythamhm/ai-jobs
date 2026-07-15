@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | Kinetic Talent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#0053db",
+                    "on-surface": "#0b1c30",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "secondary-fixed": "#dae2fd",
+                    "surface-variant": "#d3e4fe",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "on-background": "#0b1c30",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "secondary": "#565e74",
+                    "on-secondary-container": "#5c647a",
+                    "inverse-on-surface": "#eaf1ff",
+                    "inverse-surface": "#213145",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "primary": "#004ac6",
+                    "background": "#f8f9ff",
+                    "primary-container": "#2563eb",
+                    "inverse-primary": "#b4c5ff",
+                    "outline-variant": "#c3c6d7",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "surface-container-low": "#eff4ff",
+                    "on-primary-fixed": "#00174b",
+                    "tertiary-container": "#6b6e70",
+                    "secondary-container": "#dae2fd",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "surface-container": "#e5eeff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-high": "#dce9ff",
+                    "on-primary-container": "#eeefff",
+                    "on-tertiary-fixed": "#191c1e",
+                    "on-tertiary-container": "#eff1f3",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "outline": "#737686",
+                    "on-secondary-fixed": "#131b2e",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#e0e3e5",
+                    "tertiary": "#525657",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "primary-fixed": "#dbe1ff",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "on-surface-variant": "#434655"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "auto",
+                    "base": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "max-width": "1280px",
+                    "margin-mobile": "16px",
+                    "xl": "40px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex items-center justify-center p-4 md:p-0">
+<!-- Auth Container -->
+<main class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 bg-surface-container-lowest rounded-xl overflow-hidden shadow-2xl min-h-[640px]">
+<!-- Left Side: Interactive Branding / Visuals -->
+<section class="relative hidden md:flex flex-col justify-between p-xl bg-primary-container text-on-primary-container">
+<!-- Background Decorative Element -->
+<div class="absolute inset-0 opacity-10 overflow-hidden pointer-events-none">
+<div class="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -right-24 w-96 h-96 bg-secondary-fixed rounded-full blur-3xl"></div>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-4xl" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tight">Kinetic Talent</h1>
+</div>
+<div class="mt-xl space-y-md">
+<h2 class="font-headline-lg text-headline-lg leading-tight">Empowering your professional trajectory.</h2>
+<p class="font-body-lg text-body-lg opacity-90 max-w-sm">Access the world's most innovative companies and accelerate your career with data-driven job matching.</p>
+</div>
+</div>
+<div class="relative z-10 mt-auto">
+<div class="flex -space-x-3 mb-md">
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="A professional headshot of a smiling female executive in a modern bright office setting. She wears a navy blazer and has a confident expression. High-key lighting highlights the clean, minimalist corporate environment. The image uses a palette of soft whites and deep blues, reflecting professional authority." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="A close-up portrait of a male software engineer with glasses, looking thoughtfully at a monitor. The lighting is cool-toned with subtle blue highlights, emphasizing a tech-focused atmosphere. The background is a blurred high-tech workspace with clean lines and minimalist furniture. The overall aesthetic is professional and focused." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="A diverse professional woman in a bright, modern studio. She is smiling warmly at the camera, wearing professional attire. The lighting is soft and even, creating a welcoming and inclusive mood. Pristine white backgrounds and subtle blue accents keep the visual consistent with a premium corporate design system." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+</div>
+<p class="font-label-md text-label-md font-medium">Joined by 10,000+ top-tier candidates this month.</p>
+</div>
+</section>
+<!-- Right Side: Auth Forms -->
+<section class="p-lg md:p-xl flex flex-col justify-center bg-surface">
+<div class="mb-lg" id="auth-header">
+<h3 class="font-headline-lg text-headline-lg text-on-surface" id="form-title">Welcome back</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs" id="form-subtitle">Enter your credentials to access your portal</p>
+</div>
+<!-- Social Auth Group -->
+<div class="grid grid-cols-2 gap-md mb-lg">
+<button class="flex items-center justify-center gap-sm py-sm px-md border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-[0.98]">
+<img alt="Google" class="w-5 h-5" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<span>Google</span>
+</button>
+<button class="flex items-center justify-center gap-sm py-sm px-md border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-xl" data-icon="terminal">terminal</span>
+<span>GitHub</span>
+</button>
+</div>
+<div class="relative flex items-center mb-lg">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="flex-shrink mx-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">or continue with email</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+<!-- Login Form (Visible by default) -->
+<form class="form-transition space-y-md" id="login-form">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface" for="email">Work Email</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="mail">mail</span>
+<input class="w-full pl-xl pr-md py-sm bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between">
+<label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">Forgot password?</a>
+</div>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="lock">lock</span>
+<input class="w-full pl-xl pr-md py-sm bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-lg shadow-lg hover:bg-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-sm" type="submit">
+<span>Sign In</span>
+<span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Registration Form (Hidden by default) -->
+<form class="form-transition space-y-md hidden" id="register-form">
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">First Name</label>
+<input class="w-full px-md py-sm bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" placeholder="Jane" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Last Name</label>
+<input class="w-full px-md py-sm bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" placeholder="Doe" type="text"/>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Work Email</label>
+<input class="w-full px-md py-sm bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" placeholder="jane.doe@example.com" type="email"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-on-surface">Create Password</label>
+<input class="w-full px-md py-sm bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md text-body-md" placeholder="Min. 8 characters" type="password"/>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-md rounded-lg shadow-lg hover:bg-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-sm" type="submit">
+<span>Create Account</span>
+<span class="material-symbols-outlined text-lg" data-icon="how_to_reg">how_to_reg</span>
+</button>
+</form>
+<!-- Toggle Action -->
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-on-surface-variant" id="toggle-text">
+                    Don't have an account? 
+                    <button class="text-primary font-semibold hover:underline cursor-pointer" onclick="toggleAuth(true)">Create Account</button>
+</p>
+<p class="font-body-md text-body-md text-on-surface-variant hidden" id="toggle-back-text">
+                    Already have an account? 
+                    <button class="text-primary font-semibold hover:underline cursor-pointer" onclick="toggleAuth(false)">Sign In</button>
+</p>
+</div>
+<!-- Footer Links -->
+<footer class="mt-auto pt-lg flex justify-center gap-lg border-t border-outline-variant/30">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+</footer>
+</section>
+</main>
+<script>
+        function toggleAuth(isRegister) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const formTitle = document.getElementById('form-title');
+            const formSubtitle = document.getElementById('form-subtitle');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleBackText = document.getElementById('toggle-back-text');
+
+            if (isRegister) {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                formTitle.innerText = "Create Account";
+                formSubtitle.innerText = "Join Kinetic Talent and start your journey";
+                toggleText.classList.add('hidden');
+                toggleBackText.classList.remove('hidden');
+            } else {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                formTitle.innerText = "Welcome back";
+                formSubtitle.innerText = "Enter your credentials to access your portal";
+                toggleText.classList.remove('hidden');
+                toggleBackText.classList.add('hidden');
+            }
+
+            // Simple entrance animation
+            const activeForm = isRegister ? registerForm : loginForm;
+            activeForm.style.opacity = '0';
+            activeForm.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                activeForm.style.opacity = '1';
+                activeForm.style.transform = 'translateY(0)';
+            }, 50);
+        }
+
+        // Prevent default submission for demo
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Form submission logic would be triggered here.');
+            });
+        });
+    </script>
+</body></html>

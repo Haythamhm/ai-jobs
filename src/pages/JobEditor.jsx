@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { addJob, updateJob, getJobById } from '../lib/storage';
+import { useToast } from '../context/ToastContext';
 
 export default function JobEditor() {
+  const { showToast } = useToast();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
@@ -19,12 +21,15 @@ export default function JobEditor() {
 
   useEffect(() => {
     if (isEditMode) {
-      const existingJob = getJobById(id);
-      if (existingJob) {
-        setJob({ ...existingJob, requirements: existingJob.requirements?.length > 0 ? existingJob.requirements : [''] });
-      } else {
-        navigate('/manager');
-      }
+      const loadJob = async () => {
+        const existingJob = await getJobById(id);
+        if (existingJob) {
+          setJob({ ...existingJob, requirements: existingJob.requirements?.length > 0 ? existingJob.requirements : [''] });
+        } else {
+          navigate('/manager');
+        }
+      };
+      loadJob();
     }
   }, [id, isEditMode, navigate]);
 
@@ -43,22 +48,25 @@ export default function JobEditor() {
     setJob({ ...job, requirements: newReqs });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!job.title || !job.description) {
-      alert('Please fill out the title and description.');
+      showToast('Please fill out the title and description.', 'error');
       return;
     }
     
-    if (isEditMode) {
-      updateJob(id, job);
-      alert('Job updated successfully!');
-    } else {
-      addJob(job);
-      alert('Job published successfully!');
+    try {
+      if (isEditMode) {
+        await updateJob(id, job);
+        showToast('Job updated successfully!', 'success');
+      } else {
+        await addJob(job);
+        showToast('Job published successfully!', 'success');
+      }
+      navigate('/manager');
+    } catch (err) {
+      showToast(err.message || 'An error occurred while saving the job.', 'error');
     }
-    
-    navigate('/manager');
   };
 
   return (

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kinetic Talent | Candidate Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#0053db",
+                        "on-surface": "#0b1c30",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "secondary-fixed": "#dae2fd",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "on-background": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "secondary": "#565e74",
+                        "on-secondary-container": "#5c647a",
+                        "inverse-on-surface": "#eaf1ff",
+                        "inverse-surface": "#213145",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary": "#004ac6",
+                        "background": "#f8f9ff",
+                        "primary-container": "#2563eb",
+                        "inverse-primary": "#b4c5ff",
+                        "outline-variant": "#c3c6d7",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "surface-container-low": "#eff4ff",
+                        "on-primary-fixed": "#00174b",
+                        "tertiary-container": "#6b6e70",
+                        "secondary-container": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-container": "#e5eeff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-tertiary-container": "#eff1f3",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "outline": "#737686",
+                        "on-secondary-fixed": "#131b2e",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "tertiary": "#525657",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-surface-variant": "#434655"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "auto",
+                        "base": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "xl": "40px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+            color: #0b1c30;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- App Shell Container -->
+<div class="flex min-h-screen">
+<!-- SideNavBar - JSON Defined -->
+<aside class="bg-surface-container-low dark:bg-surface-container-highest text-primary font-label-md text-label-md h-screen w-64 hidden lg:flex flex-col border-r border-outline-variant dark:border-outline fixed left-0 top-0 p-md space-y-sm z-50">
+<div class="flex items-center gap-3 px-2 py-4 mb-4">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary leading-tight">Kinetic Talent</h1>
+<p class="text-[10px] text-on-surface-variant opacity-70 tracking-wider uppercase">Candidate Portal</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col space-y-1">
+<!-- Dashboard Active -->
+<a class="bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-lg font-semibold flex items-center gap-3 px-4 py-3 active:scale-95 duration-150 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:bg-surface-variant dark:hover:bg-tertiary-container rounded-lg flex items-center gap-3 px-4 py-3 active:scale-95 duration-150 transition-all" href="#">
+<span class="material-symbols-outlined">work</span>
+<span>Jobs</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:bg-surface-variant dark:hover:bg-tertiary-container rounded-lg flex items-center gap-3 px-4 py-3 active:scale-95 duration-150 transition-all" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span>Messages</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:bg-surface-variant dark:hover:bg-tertiary-container rounded-lg flex items-center gap-3 px-4 py-3 active:scale-95 duration-150 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-outline-variant">
+<button class="w-full py-3 px-4 bg-primary text-white rounded-lg font-bold text-label-md flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+                    Upload Resume
+                </button>
+</div>
+<div class="mt-auto flex flex-col space-y-1">
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:bg-surface-variant dark:hover:bg-tertiary-container rounded-lg flex items-center gap-3 px-4 py-3 active:scale-95 duration-150 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Help Center</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:bg-surface-variant dark:hover:bg-tertiary-container rounded-lg flex items-center gap-3 px-4 py-3 active:scale-95 duration-150 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 p-4 md:p-lg">
+<!-- Mobile Header (Hidden on Desktop) -->
+<header class="lg:hidden flex justify-between items-center mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">bolt</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">Kinetic Talent</span>
+</div>
+<button class="p-2 bg-surface-container rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Dashboard Content Layout (Asymmetric/Bento-ish) -->
+<div class="max-w-max-width mx-auto">
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Welcome back, Alex.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Your career journey is looking promising today.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Profile Completion Card (Small/Medium) -->
+<div class="md:col-span-4 flex flex-col space-y-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md mb-4">Profile Completion</h3>
+<div class="relative w-32 h-32 mx-auto mb-6">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary-container transition-all duration-1000 ease-out" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="72.8" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-3xl font-extrabold text-on-surface">80%</span>
+</div>
+</div>
+<p class="text-label-md font-label-md text-on-surface-variant text-center mb-4">Complete your portfolio to attract 3x more recruiter interest.</p>
+</div>
+<button class="w-full py-3 border border-primary text-primary rounded-lg font-bold hover:bg-surface-container-low transition-colors">
+                                Add Portfolio Link
+                            </button>
+</div>
+<!-- Stats Quick Glance -->
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-high p-md rounded-xl">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase opacity-70">Saved Jobs</span>
+<div class="text-headline-md font-headline-md text-primary mt-1">12</div>
+</div>
+<div class="bg-surface-container-high p-md rounded-xl">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase opacity-70">Interviews</span>
+<div class="text-headline-md font-headline-md text-primary mt-1">02</div>
+</div>
+</div>
+</div>
+<!-- My Applications List (Large) -->
+<div class="md:col-span-8">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden h-full">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md">My Applications</h3>
+<a class="text-primary font-label-md hover:underline" href="#">View All</a>
+</div>
+<div class="divide-y divide-outline-variant">
+<!-- Application Item 1 -->
+<div class="p-lg hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-lg object-cover border border-outline-variant" data-alt="Minimalist company logo design with professional corporate aesthetic, clean lines, and high-contrast color scheme. The logo is displayed in a small 48x48 square format with soft rounded corners on a clean white background, conveying trust and reliability." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<div>
+<h4 class="font-headline-md text-headline-md group-hover:text-primary transition-colors">Senior UI Designer</h4>
+<p class="text-label-md font-label-md text-on-surface-variant">Lumina Dynamics • Remote</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="status-badge px-3 py-1 bg-[#dcfce7] text-[#166534] rounded-full">Interviewing</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<div class="mt-4 flex items-center text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
+                                        Applied 4 days ago
+                                    </div>
+</div>
+<!-- Application Item 2 -->
+<div class="p-lg hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-lg object-cover border border-outline-variant" data-alt="Modern geometric brand mark for a technology consulting firm, featuring a bold navy blue palette with sharp silver accents. The logo is presented in a compact 48x48 pixel square with subtle drop shadows to create a high-performance and authoritative professional feel." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<div>
+<h4 class="font-headline-md text-headline-md group-hover:text-primary transition-colors">Product Strategy Lead</h4>
+<p class="text-label-md font-label-md text-on-surface-variant">Nexus Cloud Solutions • London, UK</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="status-badge px-3 py-1 bg-[#dbeafe] text-[#1e40af] rounded-full">Reviewing</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<div class="mt-4 flex items-center text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
+                                        Applied 1 week ago
+                                    </div>
+</div>
+<!-- Application Item 3 -->
+<div class="p-lg hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-lg object-cover border border-outline-variant" data-alt="A clean, minimalist logo for a fintech startup, using a monochrome color palette of charcoal grey and ivory. The design is centered in a small square profile frame with a 4px radius, emphasizing modern corporate simplicity and clear visual communication." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<div>
+<h4 class="font-headline-md text-headline-md group-hover:text-primary transition-colors">Visual Designer</h4>
+<p class="text-label-md font-label-md text-on-surface-variant">FinEdge Global • New York, NY</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="status-badge px-3 py-1 bg-surface-container text-on-surface-variant rounded-full">Applied</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<div class="mt-4 flex items-center text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
+                                        Applied 2 weeks ago
+                                    </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommended Jobs (Full Width Grid) -->
+<div class="md:col-span-12 mt-4">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-lg text-headline-lg">Recommended Jobs</h3>
+<button class="flex items-center gap-2 text-primary font-label-md">
+                                Filter Preferences <span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Job Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<img class="w-12 h-12 rounded-lg object-cover border border-outline-variant" data-alt="A sophisticated brand identity for an architectural firm, using deep forest green and gold tones. The logo is a simple emblem presented in a professional square container with rounded corners, set against a calm and authoritative white background." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<h4 class="font-headline-md text-headline-md mb-1 group-hover:text-primary transition-colors">Interaction Designer</h4>
+<p class="text-label-md font-label-md text-on-surface-variant mb-4">Design Guild • Berlin, DE</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-lg uppercase">Full-Time</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-lg uppercase">$110k - $140k</span>
+</div>
+<button class="w-full py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-container transition-colors">
+                                    Quick Apply
+                                </button>
+</div>
+<!-- Job Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<img class="w-12 h-12 rounded-lg object-cover border border-outline-variant" data-alt="A tech-forward corporate logo with a vibrant gradient of electric blue and violet, representing a cloud infrastructure company. The high-contrast design is centered in a minimalist square with clean margins, emphasizing a modern minimalism aesthetic." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</div>
+<h4 class="font-headline-md text-headline-md mb-1 group-hover:text-primary transition-colors">Principal UX Researcher</h4>
+<p class="text-label-md font-label-md text-on-surface-variant mb-4">Velocis Cloud • Remote</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-lg uppercase">Contract</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-lg uppercase">$95/hr</span>
+</div>
+<button class="w-full py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-container transition-colors">
+                                    Quick Apply
+                                </button>
+</div>
+<!-- Job Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<img class="w-12 h-12 rounded-lg object-cover border border-outline-variant" data-alt="Minimalist abstract logo for a media production house, featuring a high-contrast black and white palette. The logo is clean and professional, centered in a small square with 4px border radius, reflecting a high-performance tool aesthetic for career growth." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<h4 class="font-headline-md text-headline-md mb-1 group-hover:text-primary transition-colors">Creative Director</h4>
+<p class="text-label-md font-label-md text-on-surface-variant mb-4">Spectrum Media • London, UK</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-lg uppercase">Hybrid</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-lg uppercase">$160k+</span>
+</div>
+<button class="w-full py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-container transition-colors">
+                                    Quick Apply
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (Shared Component Guidance) -->
+<footer class="bg-surface-container dark:bg-surface-dim text-primary font-label-sm text-label-sm w-full py-lg mt-xl border-t border-outline-variant dark:border-outline">
+<div class="max-w-max-width mx-auto flex flex-col md:flex-row justify-between items-center px-lg">
+<p class="mb-4 md:mb-0 opacity-70">© 2024 Kinetic Talent. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity hover:opacity-80" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity hover:opacity-80" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity hover:opacity-80" href="#">Cookie Policy</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-opacity hover:opacity-80" href="#">Support</a>
+</div>
+</div>
+</footer>
+</main>
+</div>
+<!-- Floating Action Button (Only on Mobile Dashboard) -->
+<button class="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">search</span>
+</button>
+<script>
+        // Micro-interaction for application progress animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const circles = document.querySelectorAll('circle.transition-all');
+            circles.forEach(circle => {
+                circle.style.strokeDashoffset = '72.8'; // Resets the 80% completion visually
+            });
+        });
+    </script>
+</body></html>

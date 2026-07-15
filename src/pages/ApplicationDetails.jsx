@@ -10,15 +10,18 @@ export default function ApplicationDetails() {
   const [job, setJob] = useState(null);
 
   useEffect(() => {
-    const apps = getApplications();
-    const foundApp = apps.find(a => a.id === id);
-    if (foundApp) {
-      setApplication(foundApp);
-      const foundJob = getJobById(foundApp.jobId);
-      if (foundJob) setJob(foundJob);
-    } else {
-      navigate('/applications');
-    }
+    const loadDetails = async () => {
+      const apps = await getApplications();
+      const foundApp = apps.find(a => a.id === id);
+      if (foundApp) {
+        setApplication(foundApp);
+        const foundJob = await getJobById(foundApp.jobId);
+        if (foundJob) setJob(foundJob);
+      } else {
+        navigate('/applications');
+      }
+    };
+    loadDetails();
   }, [id, navigate]);
 
   if (!application) return <div className="p-8 text-center">Loading...</div>;
@@ -27,7 +30,8 @@ export default function ApplicationDetails() {
     switch (status) {
       case 'In Review': return <Clock className="text-yellow-500" size={24} />;
       case 'Interview': return <CheckCircle className="text-primary-500" size={24} />;
-      case 'Rejected': return <XCircle className="text-red-500" size={24} />;
+      case 'Hired': return <CheckCircle className="text-emerald-500" size={24} />;
+      case 'Rejected': return <XCircle className="text-rose-500" size={24} />;
       default: return <Clock className="text-slate-400" size={24} />;
     }
   };
@@ -36,7 +40,8 @@ export default function ApplicationDetails() {
     switch (status) {
       case 'In Review': return 'bg-yellow-50 border-yellow-200 text-yellow-700';
       case 'Interview': return 'bg-primary-50 border-primary-200 text-primary-700';
-      case 'Rejected': return 'bg-red-50 border-red-200 text-red-700';
+      case 'Hired': return 'bg-emerald-50 border-emerald-200 text-emerald-700';
+      case 'Rejected': return 'bg-rose-50 border-rose-200 text-rose-700';
       default: return 'bg-slate-50 border-slate-200 text-slate-700';
     }
   };
@@ -77,31 +82,37 @@ export default function ApplicationDetails() {
               </div>
             </div>
             
-            <div className="flex gap-4">
-              <div className="mt-1">
-                {application.status === 'In Review' ? (
-                  <div className="w-5 h-5 rounded-full border-2 border-primary-500 bg-primary-100"></div>
-                ) : (
-                  <CheckCircle className="text-green-500" size={20} />
-                )}
+            {application.status !== 'Pending' && (
+              <div className="flex gap-4">
+                <div className="mt-1">
+                  {application.status === 'In Review' ? (
+                    <div className="w-5 h-5 rounded-full border-2 border-primary-500 bg-primary-100"></div>
+                  ) : (
+                    <CheckCircle className="text-green-500" size={20} />
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900">Under Review</h4>
+                  <p className="text-slate-500 text-sm">The hiring team is currently reviewing your application.</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">Under Review</h4>
-                <p className="text-slate-500 text-sm">The hiring team is currently reviewing your application.</p>
-              </div>
-            </div>
+            )}
 
-            {application.status !== 'In Review' && (
+            {application.status !== 'In Review' && application.status !== 'Pending' && (
               <div className="flex gap-4">
                 <div className="mt-1">
                    {getStatusIcon(application.status)}
                 </div>
                 <div>
                   <h4 className="font-semibold text-slate-900">
-                    {application.status === 'Interview' ? 'Interview Scheduled' : 'Application Rejected'}
+                    {application.status === 'Interview' && 'Interview Scheduled'}
+                    {application.status === 'Hired' && 'Hired / Offer Extended'}
+                    {application.status === 'Rejected' && 'Application Rejected'}
                   </h4>
                   <p className="text-slate-500 text-sm">
-                    {application.status === 'Interview' ? 'Congratulations! The company has invited you to an interview.' : 'Unfortunately, the company decided to move forward with other candidates.'}
+                    {application.status === 'Interview' && 'Congratulations! The company has invited you to an interview.'}
+                    {application.status === 'Hired' && 'Great news! The company has decided to make you an offer.'}
+                    {application.status === 'Rejected' && 'Unfortunately, the company decided to move forward with other candidates.'}
                   </p>
                 </div>
               </div>

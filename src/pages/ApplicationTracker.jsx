@@ -3,7 +3,7 @@ import { Clock, CheckCircle, XCircle, ChevronRight, Building, Search } from 'luc
 import { Link } from 'react-router-dom';
 import { getApplications } from '../lib/storage';
 
-const STATUS_FILTERS = ['All', 'In Review', 'Interview', 'Rejected'];
+const STATUS_FILTERS = ['All', 'Pending', 'In Review', 'Interview', 'Hired', 'Rejected'];
 
 export default function ApplicationTracker() {
   const [applications, setApplications] = useState([]);
@@ -11,14 +11,19 @@ export default function ApplicationTracker() {
   const [activeStatus, setActiveStatus] = useState('All');
 
   useEffect(() => {
-    setApplications(getApplications());
+    const loadApps = async () => {
+      const apps = await getApplications();
+      setApplications(apps);
+    };
+    loadApps();
   }, []);
 
   const getStatusIcon = (status) => {
     switch (status) {
       case 'In Review': return <Clock className="text-yellow-500" size={20} />;
-      case 'Interview': return <CheckCircle className="text-teal-500" size={20} />;
-      case 'Rejected': return <XCircle className="text-red-500" size={20} />;
+      case 'Interview': return <CheckCircle className="text-primary-500" size={20} />;
+      case 'Hired': return <CheckCircle className="text-emerald-500" size={20} />;
+      case 'Rejected': return <XCircle className="text-rose-500" size={20} />;
       default: return <Clock className="text-slate-400" size={20} />;
     }
   };
@@ -26,8 +31,9 @@ export default function ApplicationTracker() {
   const getStatusBg = (status) => {
     switch (status) {
       case 'In Review': return 'bg-yellow-50 border-yellow-200 text-yellow-700';
-      case 'Interview': return 'bg-teal-50 border-teal-200 text-teal-700';
-      case 'Rejected': return 'bg-red-50 border-red-200 text-red-700';
+      case 'Interview': return 'bg-primary-50 border-primary-200 text-primary-700';
+      case 'Hired': return 'bg-emerald-50 border-emerald-200 text-emerald-700';
+      case 'Rejected': return 'bg-rose-50 border-rose-200 text-rose-700';
       default: return 'bg-slate-50 border-slate-200 text-slate-700';
     }
   };
@@ -37,9 +43,11 @@ export default function ApplicationTracker() {
     if (!isActive) return 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
     switch (status) {
       case 'All': return 'border border-slate-800 bg-slate-800 text-white';
+      case 'Pending': return 'border border-slate-400 bg-slate-50 text-slate-700';
       case 'In Review': return 'border border-yellow-400 bg-yellow-50 text-yellow-700';
-      case 'Interview': return 'border border-teal-400 bg-teal-50 text-teal-700';
-      case 'Rejected': return 'border border-red-400 bg-red-50 text-red-700';
+      case 'Interview': return 'border border-primary-400 bg-primary-50 text-primary-700';
+      case 'Hired': return 'border border-emerald-400 bg-emerald-50 text-emerald-700';
+      case 'Rejected': return 'border border-rose-400 bg-rose-50 text-rose-700';
       default: return 'border border-slate-200 bg-white text-slate-600';
     }
   };

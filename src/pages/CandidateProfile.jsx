@@ -1,12 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, CheckCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { saveProfile, getProfile } from '../lib/storage';
+import { useToast } from '../context/ToastContext';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+// Set up pdf.js worker using Vite asset URL
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export default function CandidateProfile() {
+  const { showToast } = useToast();
   const [file, setFile] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
   const [extractedText, setExtractedText] = useState('');
+  const [isExtractionSuccessful, setIsExtractionSuccessful] = useState(false);
   const fileInputRef = useRef(null);
 
   const [profile, setProfile] = useState({
@@ -16,16 +23,22 @@ export default function CandidateProfile() {
   });
 
   useEffect(() => {
-    const saved = getProfile();
-    if (saved) {
-      setProfile({
-        name: saved.name || '',
-        email: saved.email || '',
-        title: saved.title || ''
-      });
-      if (saved.extractedText) setExtractedText(saved.extractedText);
-      if (saved.fileName) setFile({ name: saved.fileName }); // mock file object just for UI
-    }
+    const loadProfile = async () => {
+      const saved = await getProfile();
+      if (saved) {
+        setProfile({
+          name: saved.name || '',
+          email: saved.email || '',
+          title: saved.title || ''
+        });
+        if (saved.extractedText) {
+          setExtractedText(saved.extractedText);
+          setIsExtractionSuccessful(true);
+        }
+        if (saved.fileName) setFile({ name: saved.fileName }); // mock file object just for UI
+      }
+    };
+    loadProfile();
   }, []);
 
   const handleFileChange = async (e) => {
@@ -35,10 +48,9 @@ export default function CandidateProfile() {
     setFile(selectedFile);
     setIsParsing(true);
     setExtractedText('');
+    setIsExtractionSuccessful(false);
 
     try {
-      // Set worker source lazily to avoid top-level crash
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
       const arrayBuffer = await selectedFile.arrayBuffer();
       const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
       let fullText = '';
@@ -50,23 +62,34 @@ export default function CandidateProfile() {
         fullText += pageText + '\n';
       }
 
+      if (fullText.trim().length === 0) {
+        throw new Error("No text content found in the PDF. It might be scanned or empty.");
+      }
+
       setExtractedText(fullText);
+      setIsExtractionSuccessful(true);
+      showToast('Resume text extracted successfully! Please review it below.', 'success');
     } catch (error) {
       console.error('Error parsing PDF:', error);
-      alert('Failed to parse PDF. Please try again.');
+      showToast(error.message || 'Failed to parse PDF. Please check the file or paste the text manually.', 'error');
+      setIsExtractionSuccessful(false);
     } finally {
       setIsParsing(false);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    saveProfile({
-      ...profile,
-      extractedText,
-      fileName: file ? file.name : null
-    });
-    alert('Profile saved successfully!');
+    try {
+      await saveProfile({
+        ...profile,
+        extractedText,
+        fileName: file ? file.name : null
+      }, file);
+      showToast('Profile saved successfully!', 'success');
+    } catch (err) {
+      showToast(err.message || 'An error occurred while saving your profile.', 'error');
+    }
   };
 
   return (
@@ -145,17 +168,33 @@ export default function CandidateProfile() {
             )}
           </div>
 
-          {extractedText && (
-            <div className="mt-6">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText size={18} className="text-slate-500" />
-                <h3 className="text-sm font-semibold text-slate-700">Extracted AI Data Preview</h3>
-              </div>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 h-48 overflow-y-auto text-xs font-mono text-slate-600 whitespace-pre-wrap">
-                {extractedText}
+          {isExtractionSuccessful && (
+            <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3">
+              <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={20} />
+              <div>
+                <h4 className="font-semibold text-emerald-800 text-sm">Resume successfully extracted!</h4>
+                <p className="text-emerald-700 text-xs mt-1">We found readable text in your PDF. Please review and refine the text below to make sure it includes all your skills, projects, and work experience before saving.</p>
               </div>
             </div>
           )}
+
+          <div className="mt-6">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-2">
+                <FileText size={18} className="text-slate-500" />
+                <h3 className="text-sm font-semibold text-slate-700">Review & Edit Resume Text</h3>
+              </div>
+              <span className="text-xs text-slate-400 font-mono">
+                {extractedText.length} characters
+              </span>
+            </div>
+            <textarea
+              value={extractedText}
+              onChange={(e) => setExtractedText(e.target.value)}
+              placeholder="Paste your resume text here manually if the PDF parsing did not work..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 h-64 text-sm font-mono text-slate-700 outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all whitespace-pre-wrap"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end">

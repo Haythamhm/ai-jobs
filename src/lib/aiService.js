@@ -30,7 +30,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-const AI_API_URL = '/api/ai/analyze-resume'; // swap this to your real endpoint
+const AI_API_URL = 'http://localhost:5000/api/ai/analyze-resume';
 
 /**
  * Calls the AI backend to analyze a candidate's resume against a job.
@@ -40,44 +40,40 @@ const AI_API_URL = '/api/ai/analyze-resume'; // swap this to your real endpoint
  * @returns {Promise<AnalysisResult>}
  */
 export async function analyzeCandidate(resumeText, job) {
-  // ─────────────────────────────────────────────────────────────────────────
-  // TODO: Uncomment the block below and remove the mock fallback once your
-  //       AI API is ready.
-  // ─────────────────────────────────────────────────────────────────────────
-  //
-  // try {
-  //   const response = await fetch(AI_API_URL, {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       resumeText,
-  //       jobTitle:       job.title,
-  //       jobDescription: job.description,
-  //       requirements:   job.requirements,
-  //     }),
-  //   });
-  //
-  //   if (!response.ok) {
-  //     throw new Error(`AI API responded with status ${response.status}`);
-  //   }
-  //
-  //   const data = await response.json();
-  //   return {
-  //     score:          data.score,
-  //     matchedSkills:  data.matchedSkills,
-  //     missingSkills:  data.missingSkills,
-  //     recommendation: data.recommendation,
-  //     source: 'ai',
-  //   };
-  // } catch (err) {
-  //   console.error('[AI Service] API call failed, falling back to local analysis:', err);
-  //   return localAnalysis(resumeText, job); // graceful degradation
-  // }
+  try {
+    const token = localStorage.getItem('auth_token');
+    const headers = { 
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
 
-  // ── MOCK FALLBACK (active until the real API is wired in) ─────────────────
-  // Simulates a network delay so the loading state is testable.
-  await new Promise(resolve => setTimeout(resolve, 600));
-  return localAnalysis(resumeText, job);
+    const response = await fetch(AI_API_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        resumeText,
+        jobTitle:       job.title,
+        jobDescription: job.description,
+        requirements:   job.requirements,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI API responded with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      score:          data.score,
+      matchedSkills:  data.matchedSkills,
+      missingSkills:  data.missingSkills,
+      recommendation: data.recommendation,
+      source: 'ai',
+    };
+  } catch (err) {
+    console.error('[AI Service] API call failed, falling back to local analysis:', err);
+    return localAnalysis(resumeText, job); // graceful degradation
+  }
 }
 
 /**

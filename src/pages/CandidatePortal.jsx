@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Building, DollarSign } from 'lucide-react';
+import { Search, MapPin, Building, DollarSign, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getJobs, getProfile } from '../lib/storage';
 
@@ -11,23 +11,19 @@ export default function CandidatePortal() {
   const [profileText, setProfileText] = useState('');
 
   useEffect(() => {
-    let allJobs = getJobs();
-    const profile = getProfile();
-    
-    if (profile && (profile.title || profile.extractedText)) {
-      setHasProfile(true);
-      const pText = `${profile.title} ${profile.extractedText}`.toLowerCase();
-      setProfileText(pText);
+    const loadData = async () => {
+      let allJobs = await getJobs();
+      const profile = await getProfile();
       
-      // Basic recommendation sort: jobs with title or tags found in profile go first
-      allJobs.sort((a, b) => {
-        const aScore = a.tags.some(tag => pText.includes(tag.toLowerCase())) || pText.includes(a.title.toLowerCase()) ? 1 : 0;
-        const bScore = b.tags.some(tag => pText.includes(tag.toLowerCase())) || pText.includes(b.title.toLowerCase()) ? 1 : 0;
-        return bScore - aScore;
-      });
-    }
-    
-    setJobs(allJobs);
+      if (profile && (profile.title || profile.extractedText)) {
+        setHasProfile(true);
+        const pText = `${profile.title} ${profile.extractedText}`.toLowerCase();
+        setProfileText(pText);
+      }
+      
+      setJobs(allJobs);
+    };
+    loadData();
   }, []);
 
   const handleTypeChange = (type) => {
@@ -85,7 +81,7 @@ export default function CandidatePortal() {
         <div className="flex-grow space-y-4">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-slate-900">
-              {hasProfile ? 'Recommended Jobs' : 'All Jobs'}
+              All Jobs
             </h1>
             <span className="text-slate-500 text-sm">Showing {filteredJobs.length} results</span>
           </div>
@@ -101,14 +97,15 @@ export default function CandidatePortal() {
 
           {filteredJobs.map(job => (
             <Link to={`/jobs/${job.id}`} key={job.id} className="block group">
-              <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-md transition-all hover:border-primary-200 cursor-pointer">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transform transition-all duration-300 hover:border-primary-300 cursor-pointer">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors">{job.title}</h2>
-                    <div className="flex items-center text-slate-500 mt-1 space-x-4">
-                      <span className="flex items-center"><Building size={16} className="mr-1"/> {job.company}</span>
-                      <span className="flex items-center"><MapPin size={16} className="mr-1"/> {job.location}</span>
-                      <span className="flex items-center"><DollarSign size={16} className="mr-1"/> {job.salary}</span>
+                    <div className="flex flex-wrap gap-4 text-sm text-slate-500 mt-2">
+                      <span className="flex items-center gap-1"><Building size={16} /> {job.company}</span>
+                      <span className="flex items-center gap-1"><MapPin size={16} /> {job.location}</span>
+                      <span className="flex items-center gap-1"><DollarSign size={16} /> {job.salary}</span>
+                      <span className="flex items-center gap-1"><Clock size={16} className="text-slate-400" /> {job.posted}</span>
                     </div>
                   </div>
                   <span className="bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-xs font-semibold">
@@ -125,6 +122,14 @@ export default function CandidatePortal() {
               </div>
             </Link>
           ))}
+
+          {filteredJobs.length === 0 && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-md mx-auto mt-8 shadow-sm">
+              <Search className="mx-auto text-slate-300 mb-4 animate-bounce" size={48} />
+              <h3 className="text-lg font-bold text-slate-800 mb-1">No jobs found</h3>
+              <p className="text-slate-500 text-sm">We couldn't find any job offers matching your search criteria. Try adjusting your filters or keywords.</p>
+            </div>
+          )}
         </div>
 
       </div>
