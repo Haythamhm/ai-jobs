@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Briefcase, Mail, Lock, User, Phone, CheckCircle, ArrowRight } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 
 export default function AuthLanding() {
   const { showToast } = useToast();
