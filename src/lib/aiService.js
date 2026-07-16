@@ -30,7 +30,8 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-const AI_API_URL = 'http://localhost:5000/api/ai/analyze-resume';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const AI_API_URL = `${BASE_URL}/api/ai/analyze-resume`;
 
 /**
  * Calls the AI backend to analyze a candidate's resume against a job.
@@ -73,6 +74,38 @@ export async function analyzeCandidate(resumeText, job) {
   } catch (err) {
     console.error('[AI Service] API call failed, falling back to local analysis:', err);
     return localAnalysis(resumeText, job); // graceful degradation
+  }
+}
+
+/**
+ * Calls the AI backend to organize scrambled resume text.
+ *
+ * @param {string} resumeText - Raw text extracted from the candidate's PDF
+ * @returns {Promise<string>} - Beautifully organized resume text in markdown format
+ */
+export async function organizeResumeText(resumeText) {
+  try {
+    const token = localStorage.getItem('auth_token');
+    const headers = { 
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+
+    const response = await fetch(`${BASE_URL}/api/ai/organize-resume`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ resumeText }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI Organize API responded with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.organizedText;
+  } catch (err) {
+    console.error('[AI Service] Organize resume call failed:', err);
+    throw err;
   }
 }
 

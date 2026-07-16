@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Building, DollarSign, Clock, FileText, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { getJobById, addApplication, getProfile, saveProfile } from '../lib/storage';
 import { useToast } from '../context/ToastContext';
+import { organizeResumeText } from '../lib/aiService';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
@@ -18,6 +19,7 @@ export default function JobDetails() {
   const [newFile, setNewFile] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isOrganizing, setIsOrganizing] = useState(false);
   const [extractedNewText, setExtractedNewText] = useState('');
   const [extractionSuccess, setExtractionSuccess] = useState(false);
 
@@ -73,14 +75,26 @@ export default function JobDetails() {
         throw new Error("No text content found in the PDF. It might be scanned or empty.");
       }
 
-      setExtractedNewText(fullText);
-      setExtractionSuccess(true);
-      showToast('Resume text extracted successfully! Please review it below.', 'success');
+      setIsExtracting(false);
+      setIsOrganizing(true);
+
+      try {
+        const organized = await organizeResumeText(fullText);
+        setExtractedNewText(organized);
+        setExtractionSuccess(true);
+        showToast('Resume text successfully extracted and organized by AI!', 'success');
+      } catch (aiErr) {
+        console.error('AI Organize error, falling back to raw text:', aiErr);
+        setExtractedNewText(fullText);
+        setExtractionSuccess(true);
+        showToast('Extracted text successfully, but AI organization failed. Using raw text.', 'warning');
+      } finally {
+        setIsOrganizing(false);
+      }
     } catch (error) {
       console.error('Error parsing PDF:', error);
       showToast(error.message || 'Failed to parse PDF. Please check the file or paste the text manually.', 'error');
       setExtractionSuccess(false);
-    } finally {
       setIsExtracting(false);
     }
   };
@@ -232,9 +246,14 @@ export default function JobDetails() {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
                   {isExtracting ? (
-                    <div className="flex items-center justify-center space-x-2 text-primary-600 text-xs font-semibold">
+                    <div className="flex items-center justify-center space-x-2 text-primary-600 text-xs font-semibold animate-pulse">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
                       <span>Extracting resume text...</span>
+                    </div>
+                  ) : isOrganizing ? (
+                    <div className="flex items-center justify-center space-x-2 text-teal-600 text-xs font-semibold animate-pulse">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+                      <span>AI is organizing text layout...</span>
                     </div>
                   ) : newFile ? (
                     <div className="text-slate-800 text-sm font-medium flex items-center justify-center space-x-1.5">
@@ -272,7 +291,7 @@ export default function JobDetails() {
                 )}
 
                 <button
-                  disabled={isApplying || isExtracting || !newFile}
+                  disabled={isApplying || isExtracting || isOrganizing || !newFile}
                   onClick={() => handleApplySubmit(true)}
                   className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white disabled:bg-slate-200 disabled:text-slate-400 py-2 rounded-lg font-medium transition-colors text-sm"
                 >

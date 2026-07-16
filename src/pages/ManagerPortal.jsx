@@ -296,11 +296,6 @@ export default function ManagerPortal() {
                   >
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="font-bold text-slate-900 text-sm leading-snug">{app.candidateName}</h3>
-                      {score !== null && (
-                        <span className={`text-xs px-2 py-0.5 rounded font-bold ${score >= 70 ? 'bg-green-100 text-green-700' : score >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-                          {score}%
-                        </span>
-                      )}
                     </div>
                     <p className="text-xs text-slate-500 truncate">{app.jobTitle}</p>
                     <div className={`mt-2 inline-flex items-center text-xs px-2 py-0.5 rounded-full border font-semibold ${getStatusBadge(app.status)}`}>

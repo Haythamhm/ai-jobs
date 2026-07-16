@@ -3,6 +3,7 @@ import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { saveProfile, getProfile } from '../lib/storage';
 import { useToast } from '../context/ToastContext';
+import { organizeResumeText } from '../lib/aiService';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 // Set up pdf.js worker using Vite asset URL
@@ -12,6 +13,7 @@ export default function CandidateProfile() {
   const { showToast } = useToast();
   const [file, setFile] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
+  const [isOrganizing, setIsOrganizing] = useState(false);
   const [extractedText, setExtractedText] = useState('');
   const [isExtractionSuccessful, setIsExtractionSuccessful] = useState(false);
   const fileInputRef = useRef(null);
@@ -66,14 +68,26 @@ export default function CandidateProfile() {
         throw new Error("No text content found in the PDF. It might be scanned or empty.");
       }
 
-      setExtractedText(fullText);
-      setIsExtractionSuccessful(true);
-      showToast('Resume text extracted successfully! Please review it below.', 'success');
+      setIsParsing(false);
+      setIsOrganizing(true);
+
+      try {
+        const organized = await organizeResumeText(fullText);
+        setExtractedText(organized);
+        setIsExtractionSuccessful(true);
+        showToast('Resume text successfully extracted and organized by AI!', 'success');
+      } catch (aiErr) {
+        console.error('AI Organize error, falling back to raw text:', aiErr);
+        setExtractedText(fullText);
+        setIsExtractionSuccessful(true);
+        showToast('Extracted text successfully, but AI organization failed. Using raw text.', 'warning');
+      } finally {
+        setIsOrganizing(false);
+      }
     } catch (error) {
       console.error('Error parsing PDF:', error);
       showToast(error.message || 'Failed to parse PDF. Please check the file or paste the text manually.', 'error');
       setIsExtractionSuccessful(false);
-    } finally {
       setIsParsing(false);
     }
   };
@@ -152,6 +166,11 @@ export default function CandidateProfile() {
               <div className="flex flex-col items-center">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mb-4"></div>
                 <p className="text-primary-700 font-medium">Extracting text from PDF...</p>
+              </div>
+            ) : isOrganizing ? (
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-600 mb-4 animate-pulse"></div>
+                <p className="text-teal-700 font-medium animate-pulse">AI is organizing your resume layout...</p>
               </div>
             ) : file ? (
               <div className="flex flex-col items-center text-primary-700">

@@ -68,6 +68,63 @@ You MUST output ONLY valid JSON using exactly this structure:
   }
 };
 
+// @desc    Organize scrambled resume text using OpenRouter/OpenAI
+// @route   POST /api/ai/organize-resume
+// @access  Private (Candidate/Manager)
+const organizeResume = async (req, res, next) => {
+  try {
+    const { resumeText } = req.body;
+
+    if (!resumeText || resumeText.trim().length === 0) {
+      res.status(400);
+      throw new Error('Resume text is required');
+    }
+
+    const openai = new OpenAI({
+      baseURL: process.env.OPENAI_BASE_URL,
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
+    const systemPrompt = `
+You are an expert Resume Editor & Optimizer AI.
+Your task is to take raw, messy, or unformatted text extracted from a PDF resume and reorganize it into a professional, clear, and well-structured CV format.
+
+Please follow these strict guidelines:
+1. DO NOT fabricate or add any new information (no fake jobs, fake skills, fake locations, fake contact info, or fake education).
+2. DO NOT lose any critical information from the original text (names, company names, dates, job titles, technologies, languages, certificates, and bullet points must all be retained).
+3. If the input text is in a foreign language (e.g. French, Spanish), keep the content in that same language but clean up and standardize the terminology.
+4. Correct spelling, punctuation, typos, spacing, and broken/unjoined lines resulting from PDF extraction.
+5. Structure the text clearly using the following sections in professional Markdown formatting:
+   - **Full Name & Contact Info** (Email, Phone, LinkedIn, Portfolio - clearly formatted at the top)
+   - **Professional Title**
+   - **Professional Summary** (A concise summary of the candidate's profile)
+   - **Work Experience** (List roles in reverse chronological order, with Company Name, Title, Dates, and Bullet Points of achievements and technologies used)
+   - **Projects** (If any, list key projects with descriptions and technologies)
+   - **Education** (Degree, Institution, Dates)
+   - **Skills** (Categorized cleanly, e.g. Technical Skills, Languages, Soft Skills)
+
+Make the final output highly clean, professional, and readable.
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'openai/gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `RAW RESUME TEXT:\n${resumeText}` }
+      ],
+      temperature: 0.3,
+    });
+
+    const organizedText = completion.choices[0].message.content;
+
+    res.status(200).json({ organizedText });
+  } catch (error) {
+    console.error('AI Organize Error:', error);
+    next(error);
+  }
+};
+
 module.exports = {
   analyzeResume,
+  organizeResume,
 };
